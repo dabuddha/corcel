@@ -23,10 +23,9 @@ class Model extends Eloquent
      * Replace the original hasMany function to forward the connection name.
      *
      * @param string $related
-     * @param null   $foreignKey
-     * @param null   $localKey
-     *
-     * @return Illuminate\Database\Eloquent\Relations\HasMany
+     * @param null $foreignKey
+     * @param null $localKey
+     * @return HasMany
      */
     public function hasMany($related, $foreignKey = null, $localKey = null)
     {
@@ -48,10 +47,9 @@ class Model extends Eloquent
      * Replace the original hasOne function to forward the connection name.
      *
      * @param string $related
-     * @param null   $foreignKey
-     * @param null   $localKey
-     *
-     * @return Illuminate\Database\Eloquent\Relations\HasOne
+     * @param null $foreignKey
+     * @param null $localKey
+     * @return HasOne
      */
     public function hasOne($related, $foreignKey = null, $localKey = null)
     {
@@ -73,11 +71,10 @@ class Model extends Eloquent
      * Replace the original belongsTo function to forward the connection name.
      *
      * @param string $related
-     * @param null   $foreignKey
-     * @param null   $otherKey
-     * @param null   $relation
-     *
-     * @return Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @param null $foreignKey
+     * @param null $otherKey
+     * @param null $relation
+     * @return BelongsTo
      */
     public function belongsTo($related, $foreignKey = null, $otherKey = null, $relation = null)
     {
@@ -109,12 +106,11 @@ class Model extends Eloquent
      * Replace the original belongsToMany function to forward the connection name.
      *
      * @param string $related
-     * @param null   $table
-     * @param null   $foreignKey
-     * @param null   $otherKey
-     * @param null   $relation
-     *
-     * @return Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @param null $table
+     * @param null $foreignKey
+     * @param null $otherKey
+     * @param null $relation
+     * @return BelongsToMany
      */
     public function belongsToMany($related, $table = null, $foreignKey = null, $otherKey = null, $relation = null)
     {
