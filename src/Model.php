@@ -25,7 +25,7 @@ class Model extends Eloquent
      */
     public function __construct(array $attributes = array())
     {
-        if ($connection = config('config.connection')) {
+        if (function_exists('config') and $connection = config('config.connection')) {
             $this->connection = $connection;
         }
 
