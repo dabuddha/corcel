@@ -234,25 +234,6 @@ class Post extends Model
     }
 
     /**
-     * Meta filter scope.
-     *
-     * @param $query
-     * @param $meta
-     * @param null $value
-     *
-     * @return Illuminate\Database\Eloquent\Collection
-     */
-    public function scopeHasMeta($query, $meta, $value = null)
-    {
-        return $query->whereHas('meta', function ($query) use ($meta, $value) {
-            $query->where('meta_key', $meta);
-            if (!is_null($value)) {
-                $query->where('meta_value', $value);
-            }
-        });
-    }
-
-    /**
      * Whether the post contains the term or not.
      *
      * @param string $taxonomy

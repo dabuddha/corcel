@@ -86,6 +86,21 @@ class PostBuilder extends Builder
     }
 
     /**
+     * @param string $meta
+     * @param null|mixed $value
+     * @return PostBuilder
+     */
+    public function hasMeta($meta, $value = null)
+    {
+        return $this->whereHas('meta', function (Builder $query) use ($meta, $value) {
+            $query->where('meta_key', $meta);
+            if ($value) {
+                $query->where('meta_value', $value);
+            }
+        });
+    }
+
+    /**
      * Paginate the results.
      *
      * @param int $perPage
