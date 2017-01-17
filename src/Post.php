@@ -233,15 +233,6 @@ class Post extends Model
         }
     }
 
-    public function save(array $options = [])
-    {
-        if (isset($this->attributes[$this->primaryKey])) {
-            $this->meta->save($this->attributes[$this->primaryKey]);
-        }
-
-        return parent::save($options);
-    }
-
     /**
      * Meta filter scope.
      *
