@@ -58,7 +58,7 @@ class Post extends Model
 
     /**
      * The accessors to append to the model's array form.
-     *
+     * TODO create a $aliases array and set all of them inside getAttribute() method
      * @var array
      */
     protected $appends = [
@@ -481,6 +481,8 @@ class Post extends Model
      * @param array $attributes
      * @param null  $connection
      *
+     * TODO remove this method because it's used only for shortcodes, and Shortcodes should be moved to somewhere else
+     *
      * @return mixed
      */
     public function newFromBuilder($attributes = [], $connection = null)
@@ -512,6 +514,8 @@ class Post extends Model
      * If you register a Page class for the post_type 'page', then whenever a Post is fetched from the database that has
      * its post_type has 'page', it will be returned as a Page instance, instead of the default and generic
      * Post instance.
+     *
+     * TODO refactor shortcode support
      *
      * @param string $name  The name of the post type (e.g. 'post', 'page', 'custom_post_type')
      * @param string $class The class that represents the post type model (e.g. 'Post', 'Page', 'CustomPostType')
