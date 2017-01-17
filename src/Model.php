@@ -5,6 +5,7 @@ namespace Corcel;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -24,7 +25,10 @@ class Model extends Eloquent
      */
     public function __construct(array $attributes = array())
     {
-        $this->connection = config('corcel.connection');
+        if ($connection = config('config.connection')) {
+            $this->connection = $connection;
+        }
+
         parent::__construct($attributes);
     }
 
@@ -41,11 +45,30 @@ class Model extends Eloquent
         $foreignKey = $foreignKey ?: $this->getForeignKey();
 
         $instance = new $related();
-        $instance->setConnection($this->connection);
+        $this->forwardConnection($instance);
 
         $localKey = $localKey ?: $this->getKeyName();
 
         return new HasMany($instance->newQuery(), $this, $foreignKey, $localKey);
+    }
+
+    /**
+     * @param string $related
+     * @param string $through
+     * @param null|string $firstKey
+     * @param null|string $secondKey
+     * @return HasManyThrough
+     */
+    public function hasManyThrough($related, $through, $firstKey = null, $secondKey = null)
+    {
+        $through = new $through;
+        $firstKey = $firstKey ?: $this->getForeignKey();
+        $secondKey = $secondKey ?: $through->getForeignKey();
+
+        $instance = new $related;
+        $this->forwardConnection($instance);
+
+        return new HasManyThrough($instance->newQuery(), $this, $through, $firstKey, $secondKey);
     }
 
     /**
@@ -59,7 +82,7 @@ class Model extends Eloquent
         $foreignKey = $foreignKey ?: $this->getForeignKey();
 
         $instance = new $related();
-        $instance->setConnection($this->connection);
+        $this->forwardConnection($instance);
 
         $localKey = $localKey ?: $this->getKeyName();
 
@@ -85,9 +108,10 @@ class Model extends Eloquent
         }
 
         $instance = new $related;
-        $instance->setConnection($this->connection);
+        $this->forwardConnection($instance);
 
         $query = $instance->newQuery();
+
         $otherKey = $otherKey ?: $instance->getKeyName();
 
         return new BelongsTo($query, $this, $foreignKey, $otherKey, $relation);
@@ -110,7 +134,7 @@ class Model extends Eloquent
         $foreignKey = $foreignKey ?: $this->getForeignKey();
 
         $instance = new $related();
-        $instance->setConnection($this->connection);
+        $this->forwardConnection($instance);
 
         $otherKey = $otherKey ?: $instance->getForeignKey();
 
@@ -131,6 +155,15 @@ class Model extends Eloquent
     {
         $relation = parent::getRelation($relation);
 
+        return $this->forwardConnection($relation);
+    }
+
+    /**
+     * @param mixed $relation
+     * @return Eloquent|Collection|mixed
+     */
+    protected function forwardConnection($relation)
+    {
         if ($relation instanceof Collection) {
             return $relation->each(function (Eloquent $model) {
                 $model->setConnection($this->connection);
