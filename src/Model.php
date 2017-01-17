@@ -164,6 +164,10 @@ class Model extends Eloquent
      */
     protected function forwardConnection($relation)
     {
+        if (!$this->connection) {
+            return $relation;
+        }
+
         if ($relation instanceof Collection) {
             return $relation->each(function (Eloquent $model) {
                 $model->setConnection($this->connection);
