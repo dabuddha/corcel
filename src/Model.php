@@ -25,7 +25,7 @@ class Model extends Eloquent
      */
     public function __construct(array $attributes = array())
     {
-        if (function_exists('config') and $connection = config('config.connection')) {
+        if (class_exists('\\Config') and $connection = \Config::get('corcel.connection')) {
             $this->connection = $connection;
         }
 
