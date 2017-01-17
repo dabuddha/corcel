@@ -1,11 +1,5 @@
 <?php
 
-/**
- * Post model.
- *
- * @author Junior Grossi <juniorgro@gmail.com>
- */
-
 namespace Corcel;
 
 use Corcel\Acf\AdvancedCustomFields;
@@ -24,11 +18,34 @@ class Post extends Model
     protected static $postTypes = [];
     protected static $shortcodes = [];
 
+    /**
+     * @var string
+     */
     protected $table = 'posts';
+
+    /**
+     * @var string
+     */
     protected $primaryKey = 'ID';
-    protected $dates = ['post_date', 'post_date_gmt', 'post_modified', 'post_modified_gmt'];
+
+    /**
+     * @var array
+     */
+    protected $dates = [
+        'post_date',
+        'post_date_gmt',
+        'post_modified',
+        'post_modified_gmt'
+    ];
+
+    /**
+     * @var array
+     */
     protected $with = ['meta'];
 
+    /**
+     * @var array
+     */
     protected $fillable = [
         'post_content',
         'post_title',
@@ -68,6 +85,9 @@ class Post extends Model
         'keywords_str',
     ];
 
+    /**
+     * @param array $attributes
+     */
     public function __construct(array $attributes = [])
     {
         foreach ($this->fillable as $field) {
@@ -80,113 +100,89 @@ class Post extends Model
     }
 
     /**
-     * Meta data relationship.
-     *
-     * @return Corcel\PostMetaCollection
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function meta()
     {
-        return $this->hasMany('Corcel\PostMeta', 'post_id');
+        return $this->hasMany(PostMeta::class, 'post_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function fields()
     {
         return $this->meta();
     }
 
     /**
-     * Return the post thumbnail.
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function thumbnail()
     {
-        return $this->hasOne('Corcel\ThumbnailMeta', 'post_id')
+        return $this->hasOne(ThumbnailMeta::class, 'post_id')
             ->where('meta_key', '_thumbnail_id');
     }
 
     /**
-     * Taxonomy relationship.
-     *
-     * @return Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function taxonomies()
     {
-        return $this->belongsToMany('Corcel\TermTaxonomy', 'term_relationships', 'object_id', 'term_taxonomy_id');
+        return $this->belongsToMany(TermTaxonomy::class, 'term_relationships', 'object_id', 'term_taxonomy_id');
     }
 
     /**
-     * Comments relationship.
-     *
-     * @return Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function comments()
     {
-        return $this->hasMany('Corcel\Comment', 'comment_post_ID');
+        return $this->hasMany(Comment::class, 'comment_post_ID');
     }
 
     /**
-     *   Author relationship.
-     *
-     * @return Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function author()
     {
-        return $this->belongsTo('Corcel\User', 'post_author');
+        return $this->belongsTo(User::class, 'post_author');
     }
 
     /**
-     * Parent post.
-     *
-     * @return Corcel\Post
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function parent()
     {
-        return $this->belongsTo('Corcel\Post', 'post_parent');
+        return $this->belongsTo(Post::class, 'post_parent');
     }
 
     /**
-     * Get attachment.
-     *
-     * @return Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function attachment()
     {
-        return $this->hasMany('Corcel\Post', 'post_parent')->where('post_type', 'attachment');
+        return $this->hasMany(Post::class, 'post_parent')
+            ->where('post_type', 'attachment');
     }
 
     /**
-     * Get revisions from post.
-     *
-     * @return Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function revision()
     {
-        return $this->hasMany('Corcel\Post', 'post_parent')->where('post_type', 'revision');
+        return $this->hasMany(Post::class, 'post_parent')
+            ->where('post_type', 'revision');
     }
 
     /**
-     * Overriding newQuery() to the custom PostBuilder with some interesting methods.
-     *
-     * @param bool $excludeDeleted
-     *
-     * @return Corcel\PostBuilder
+     * @param \Illuminate\Database\Query\Builder $query
+     * @return PostBuilder
      */
-    public function newQuery($excludeDeleted = true)
+    public function newEloquentBuilder($query)
     {
-        $builder = new PostBuilder($this->newBaseQueryBuilder());
-        $builder->setModel($this)->with($this->with);
-        // disabled the default orderBy because else Post::all()->orderBy(..)
-        // is not working properly anymore.
-        // $builder->orderBy('post_date', 'desc');
+        $builder = new PostBuilder($query);
 
-        if (isset($this->postType) and $this->postType) {
-            $builder->type($this->postType);
-        }
-
-        if ($excludeDeleted and $this->softDelete) {
-            $builder->whereNull($this->getQualifiedDeletedAtColumn());
-        }
-
-        return $builder;
+        return $builder->type($builder)->orderBy(static::CREATED_AT, 'DESC');
     }
 
     /**
