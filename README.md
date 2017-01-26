@@ -61,6 +61,8 @@ If you are using Laravel you **do not need** to configure database again. It's a
 ],
 ```
 
+Corcel uses the database connection names `wordpress` or `corcel` by default.
+
 Now you should create your own `Post` model class. Laravel stores model classes in `app` directory, inside `App` namespace (or the name you gave it). Your `Post` class should extends `Corcel\Post` and set the connection name you're using, in this case `wordpress`:
 
 ```php

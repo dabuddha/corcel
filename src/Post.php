@@ -82,7 +82,7 @@ class Post extends Model
     /**
      * Meta data relationship.
      *
-     * @return Corcel\PostMetaCollection
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function meta()
     {
@@ -106,7 +106,7 @@ class Post extends Model
     /**
      * Taxonomy relationship.
      *
-     * @return Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function taxonomies()
     {
@@ -116,7 +116,7 @@ class Post extends Model
     /**
      * Comments relationship.
      *
-     * @return Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function comments()
     {
@@ -126,7 +126,7 @@ class Post extends Model
     /**
      *   Author relationship.
      *
-     * @return Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function author()
     {
@@ -136,7 +136,7 @@ class Post extends Model
     /**
      * Parent post.
      *
-     * @return Corcel\Post
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function parent()
     {
@@ -144,9 +144,7 @@ class Post extends Model
     }
 
     /**
-     * Get attachment.
-     *
-     * @return Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function attachment()
     {
@@ -156,7 +154,7 @@ class Post extends Model
     /**
      * Get revisions from post.
      *
-     * @return Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function revision()
     {
@@ -168,7 +166,7 @@ class Post extends Model
      *
      * @param bool $excludeDeleted
      *
-     * @return Corcel\PostBuilder
+     * @return \Corcel\PostBuilder
      */
     public function newQuery($excludeDeleted = true)
     {
@@ -237,6 +235,10 @@ class Post extends Model
         }
     }
 
+    /**
+     * @param array $options
+     * @return bool
+     */
     public function save(array $options = [])
     {
         if (isset($this->attributes[$this->primaryKey])) {
